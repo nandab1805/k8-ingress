@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+  labels:
+    app: app2
+spec:
+  # modify replicas according to your case
+  replicas: 1
+  selector:
+    matchLabels: #these labels are used to find the pods
+     app: app2
+  template: #pod definition
+    metadata:
+      labels: #these labels are pods labels
+        app: app2
+    spec:
+      containers:
+      - name: app2
+        image: nanda1805/ingress2:v1
+        imagePullPolicy: Always #Always, IfNotPresent, Never it will pull the image from the docker hub
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "128m"
+          limits:
+            memory: "100Mi"
+            cpu: "256m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2
+spec:
+  selector:
+    app: app2
+  ports:
+    - protocol: TCP
+      port: 80 # Service Port
+      targetPort: 80 # container Port
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-wildcard-host
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/tags: Envinorment=dev,Team=test,Project=Roboshop
+    alb.ingress.kubernetes.io/group.name: nanda1805
+spec:
+  rules:
+  - host: "app2.nanda.cfd"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/bar"
+        backend:
+          service:
+            name: app2
+            port:
+              number: 80
+
+
