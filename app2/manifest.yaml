@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: app2
-        image: nanda1805/ingress2:v1
+        image: nanda1805/app2:v1
         imagePullPolicy: Always #Always, IfNotPresent, Never it will pull the image from the docker hub
         resources:
           requests:
